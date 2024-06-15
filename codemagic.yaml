@@ -43,5 +43,3 @@ workflows:
           - export PATH="$PATH":"$HOME/.pub-cache/bin"
           - cd ios; bundle install; cd ..
           - bundle exec fastlane beta
-
-`` his It
