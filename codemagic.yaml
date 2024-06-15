@@ -1,0 +1,46 @@
+workflows:
+  flutter_ios_build:
+    name: Flutter iOS Build
+    environment:
+      flutter: stable
+
+    # Specify the workflow trigger. This example triggers on each commit to the master branch.
+    trigger:
+      event:
+        - push
+        - pull_request
+
+    # Workflow steps
+    steps:
+      # Step to check out the repository
+      - name: Check out code
+        script:
+          - git clone --depth 1 $CM_REPOSITORY_URL $FCI_BUILD_DIR
+        always_run: true
+
+      # Step to install Flutter dependencies
+      - name: Install dependencies
+        script:
+          - flutter pub get
+
+      # Step to build Flutter app for iOS
+      - name: Build iOS app
+        script:
+          - flutter build ios --release --no-codesign
+
+      # Step to package IPA
+      - name: Package IPA
+        script:
+          - flutter build ios --release --no-codesign
+          - mkdir -p $FCI_BUILD_DIR/build/ios/ipa
+          - xcodebuild -exportArchive -archivePath build/ios/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $FCI_BUILD_DIR/build/ios/ipa
+
+      # Step to deploy or store artifacts (e.g., upload to Firebase)
+      - name: Deploy to Firebase App Distribution
+        script:
+          - flutter pub run flutter_plugin_tools pub run build_runner build --delete-conflicting-outputs
+          - export PATH="$PATH":"$HOME/.pub-cache/bin"
+          - cd ios; bundle install; cd ..
+          - bundle exec fastlane beta
+
+`` his It
